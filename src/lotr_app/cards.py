@@ -38,7 +38,7 @@ def show_card():
 def show_dataframe_cards(cards):
 
     df = pd.DataFrame(cards)
-    columns = ['collection', "number", "name", "description"]
+    columns = ['collection', "number", "name","type", "description"]
     df = df[columns]
     df["collection"] = df["collection"].apply(lambda x: x["name"])
     df.sort_values(by=["collection", "number"], inplace=True)
@@ -55,6 +55,10 @@ def show_dataframe_cards(cards):
         "name": st.column_config.TextColumn(
             "Nome",
             help="Nome da Carta",
+        ),
+        "type": st.column_config.TextColumn(
+            "Tipo",
+            help="Tipo da Carta",
         ),
         "description": st.column_config.TextColumn(
             "Descrição",
@@ -73,6 +77,8 @@ def create_card(collections):
     card_number_select_box = st.number_input("Número", min_value=1, max_value=500, value=1,)
     card_name_select_box = st.text_input("Nome", value="")
     card_description_select_box = st.text_area("Descrição", value="")
+    card_type_select_box = st.text_input("Tipo", value="",key="create_card_type")
+    card_cost = st.number_input("Custo", min_value=0, max_value=20, value=0,key="create_card_cost")
 
     collection_selected_card = [i for i in collections if i['name'] == card_collection_select_box][0]
 
@@ -83,6 +89,8 @@ def create_card(collections):
             "number": card_number_select_box,
             "name": card_name_select_box,
             "description": card_description_select_box,
+            "type": card_type_select_box,
+            "cost": card_cost,
         }
 
         resp = api.create_card(**data)
@@ -107,16 +115,22 @@ def edit_card(collections):
     numbers = [i["number"] for i in cards_collection]
     card_number_select_box = col2.selectbox("Número", options=numbers, key="edit_card_number", disabled=len(numbers) == 0)
     
+
     if len(numbers) == 0:
         st.warning("Nenhuma carta encontrada nesta coleção.")
         return
 
     card = api.get_cards(collection_id=collection_id, number=card_number_select_box)[0]
+    
     card_name_select_box = st.text_input("Nome", value=card["name"])
     card_description_select_box = st.text_area("Descrição", value=card["description"])
+    card_type_select_box = st.text_input("Tipo", value=card['type'],key="edit_card_type")
+    card_cost = st.number_input("Custo", min_value=0, max_value=20, value=card['cost'],key="edit_card_cost")
 
     card["name"] = card_name_select_box
     card["description"] = card_description_select_box
+    card["type"] = card_type_select_box
+    card["cost"] = card_cost
 
     col_edit, _, col_excl = st.columns([1, 2, 1])
 
