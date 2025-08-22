@@ -47,6 +47,8 @@ type Card struct {
 	Collection   Collection `json:"collection" gorm:"foreignKey:CollectionID"`
 	Name         string     `json:"name" gorm:"varchar(100);not null"`
 	Description  string     `json:"description" gorm:"varchar(100);not null"`
+	Type         string     `json:"type" gorm:"varchar(100);not null"`
+	Cost         int        `json:"cost" gorm:"not null"`
 }
 
 type Deck struct {
@@ -118,7 +120,7 @@ func NewCollection(name, description string) *Collection {
 	}
 }
 
-func NewCard(number int, collectionID, name, description string) *Card {
+func NewCard(number int, collectionID, name, description, typeString string, cost int) *Card {
 	id := fmt.Sprintf("%d - %s", number, collectionID)
 	return &Card{
 		Id:           id,
@@ -126,6 +128,8 @@ func NewCard(number int, collectionID, name, description string) *Card {
 		CollectionID: collectionID,
 		Name:         name,
 		Description:  description,
+		Type:         typeString,
+		Cost:         cost,
 	}
 }
 

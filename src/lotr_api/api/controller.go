@@ -251,7 +251,7 @@ func (c *Controller) CreateCard(ctx fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
-	card := models.NewCard(payload.Number, payload.CollectionID, payload.Name, payload.Description)
+	card := models.NewCard(payload.Number, payload.CollectionID, payload.Name, payload.Description, payload.Type, payload.Cost)
 	if err := c.Con.Create(&card).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create card"})
 	}
