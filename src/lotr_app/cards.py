@@ -75,28 +75,25 @@ def show_dataframe_cards(cards):
 
 
 def create_card(collections):
-    collection_names = [i["name"] for i in collections]
+    
+    data = {
+        "collection": {},
+        "collection_id": "",
+        "number": 1,
+        "name": "",
+        "description": "",
+        "type": "",
+        "cost": 0,
+        "willpower": 0,
+        "attack": 0,
+        "defense": 0,
+        "sphere_type": "",
+        "hit_points": 0,
+    }
 
-    card_collection_select_box = st.selectbox("Coleção", options=collection_names, key="create_card_collection")
-    card_number_select_box = st.number_input("Número", min_value=1, max_value=500, value=1,)
-    card_name_select_box = st.text_input("Nome", value="")
-    card_description_select_box = st.text_area("Descrição", value="")
-    card_type_select_box = st.text_input("Tipo", value="",key="create_card_type")
-    card_cost = st.number_input("Custo", min_value=0, max_value=20, value=0,key="create_card_cost")
-
-    collection_selected_card = [i for i in collections if i['name'] == card_collection_select_box][0]
+    data = collect_card_info(data, collections)
 
     if st.button("Criar Carta", key="create_card"):
-        data = {
-            "collection": collection_selected_card,
-            "collection_id": collection_selected_card["id"],
-            "number": card_number_select_box,
-            "name": card_name_select_box,
-            "description": card_description_select_box,
-            "type": card_type_select_box,
-            "cost": card_cost,
-        }
-
         resp = api.create_card(**data)
 
         if "error" in resp:
@@ -106,39 +103,25 @@ def create_card(collections):
             time.sleep(1)
             st.rerun()
 
+
 def edit_card(collections):
-    collection_names = [i["name"] for i in collections]
 
-    col1, col2 = st.columns(2)
+    cards = api.get_cards()
 
-    card_collection_select_box = col1.selectbox("Coleção", options=collection_names, key="create_card_collection_edit_card")
-    collection_id=[i["id"] for i in collections if i['name'] == card_collection_select_box][0]
+    card = st.selectbox("Selecione a carta para editar",
+                        options=cards,
+                        format_func=lambda x: f'{x["name"]} ({x["collection"]["name"]} - {x["number"]})',
+                        key="edit_card_selectbox"
+                        )
 
-    cards_collection = api.get_cards(collection_id=collection_id)
-
-    numbers = [i["number"] for i in cards_collection]
-    card_number_select_box = col2.selectbox("Número", options=numbers, key="edit_card_number", disabled=len(numbers) == 0)
-    
-
-    if len(numbers) == 0:
-        st.warning("Nenhuma carta encontrada nesta coleção.")
-        return
-
-    card = api.get_cards(collection_id=collection_id, number=card_number_select_box)[0]
-    
-    card_name_select_box = st.text_input("Nome", value=card["name"])
-    card_description_select_box = st.text_area("Descrição", value=card["description"])
-    card_type_select_box = st.text_input("Tipo", value=card['type'],key="edit_card_type")
-    card_cost = st.number_input("Custo", min_value=0, max_value=20, value=card['cost'],key="edit_card_cost")
-
-    card["name"] = card_name_select_box
-    card["description"] = card_description_select_box
-    card["type"] = card_type_select_box
-    card["cost"] = card_cost
+    card.update(collect_card_info(card, collections, mode='edit'))
 
     col_edit, _, col_excl = st.columns([1, 2, 1])
 
     if col_edit.button("Salvar Carta"):
+
+        st.write(card)
+
         resp = api.put_card(**card)
         if "error" in resp:
             st.error(resp["error"])
@@ -155,3 +138,53 @@ def edit_card(collections):
             st.success("Carta excluída com sucesso!")
             time.sleep(1)
             st.rerun()
+
+
+def collect_card_info(data, collections, mode='create'):
+
+    c1, c2 = st.columns(2)
+    card_collection_select_box = c1.selectbox("Coleção",
+                                              options=collections,
+                                              format_func=lambda x: x["name"],
+                                              key=f"create_card_collection_{mode}",
+                                              )
+    
+    card_number_select_box = c2.number_input("Número", min_value=1, max_value=500, value=data["number"],key=f"create_card_number_{mode}")
+
+    card_name_select_box = st.text_input("Nome", value=data["name"], key=f"create_card_name_{mode}")
+    card_description_select_box = st.text_area("Descrição", value=data["description"], key=f"create_card_description_{mode}")
+
+    type_cards_list = ["Herói", "Aliado", "Complemento", "Evento"]
+    type_cards_list.sort()
+    card_type_select_box = st.selectbox("Tipo", options=type_cards_list, key=f"create_card_type_{mode}", index=type_cards_list.index(data["type"]) if data['type']!="" else 0)
+
+    c1, c2 = st.columns(2)
+    card_cost = c1.number_input("Custo", min_value=0, max_value=20, value=data["cost"], key=f"create_card_cost_{mode}")
+    sphere_types = ['Liderança', 'Conhecimento', 'Espírito', 'Tática']
+    sphere_types.sort()
+    card_sphereType = c2.selectbox("Tipo de Esfera", options=sphere_types ,key=f"create_card_sphereType_{mode}", index=sphere_types.index(data["sphere_type"]) if data['sphere_type']!="" else 0)
+
+
+    c1,c2,c3 = st.columns(3)
+    card_willpower = c1.number_input("Força de Vontade", min_value=0, max_value=20, value=data["willpower"],key=f"create_card_willpower_{mode}")
+    card_attack = c2.number_input("Força de Ataque", min_value=0, max_value=20, value=data["attack"],key=f"create_card_attack_{mode}")
+    card_defense = c3.number_input("Força de Defesa", min_value=0, max_value=20, value=data["defense"],key=f"create_card_defense_{mode}")
+
+    card_hitPoints = st.number_input("Pontos de Vida", min_value=0, max_value=20, value=data["hit_points"],key=f"create_card_hitPoints_{mode}")
+
+    data = {
+        "collection": card_collection_select_box,
+        "collection_id": card_collection_select_box["id"],
+        "number": card_number_select_box,
+        "name": card_name_select_box,
+        "description": card_description_select_box,
+        "type": card_type_select_box,
+        "cost": card_cost,
+        "willpower": card_willpower,
+        "attack": card_attack,
+        "defense": card_defense,
+        "sphere_type": card_sphereType,
+        "hit_points": card_hitPoints,
+    }
+
+    return data

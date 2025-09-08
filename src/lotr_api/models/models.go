@@ -49,6 +49,11 @@ type Card struct {
 	Description  string     `json:"description" gorm:"varchar(100);not null"`
 	Type         string     `json:"type" gorm:"varchar(100);not null"`
 	Cost         int        `json:"cost" gorm:"not null"`
+	Willpower    int        `json:"willpower" gorm:"integer"`
+	Attack       int        `json:"attack" gorm:"integer"`
+	Defense      int        `json:"defense" gorm:"integer"`
+	SphereType   string     `json:"sphere_type" gorm:"varchar(100)"`
+	HitPoints    int        `json:"hit_points" gorm:"integer"`
 }
 
 type Deck struct {
@@ -120,7 +125,19 @@ func NewCollection(name, description string) *Collection {
 	}
 }
 
-func NewCard(number int, collectionID, name, description, typeString string, cost int) *Card {
+func NewCard(
+	number int,
+	collectionID,
+	name,
+	description,
+	typeString string,
+	cost int,
+	willpower int,
+	attack int,
+	defense int,
+	sphereType string,
+	hitPoints int,
+) *Card {
 	id := fmt.Sprintf("%d - %s", number, collectionID)
 	return &Card{
 		Id:           id,
@@ -130,6 +147,11 @@ func NewCard(number int, collectionID, name, description, typeString string, cos
 		Description:  description,
 		Type:         typeString,
 		Cost:         cost,
+		Willpower:    willpower,
+		Attack:       attack,
+		Defense:      defense,
+		SphereType:   sphereType,
+		HitPoints:    hitPoints,
 	}
 }
 

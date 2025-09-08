@@ -251,7 +251,19 @@ func (c *Controller) CreateCard(ctx fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
-	card := models.NewCard(payload.Number, payload.CollectionID, payload.Name, payload.Description, payload.Type, payload.Cost)
+	card := models.NewCard(
+		payload.Number,
+		payload.CollectionID,
+		payload.Name,
+		payload.Description,
+		payload.Type,
+		payload.Cost,
+		payload.Willpower,
+		payload.Attack,
+		payload.Defense,
+		payload.SphereType,
+		payload.HitPoints,
+	)
 	if err := c.Con.Create(&card).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create card"})
 	}
@@ -399,8 +411,6 @@ func (c *Controller) CreatePlayerToPlay(ctx fiber.Ctx) error {
 	if err := ctx.Bind().Body(payload); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
-
-	log.Println(payload)
 
 	playerToPlay := models.NewPlayerToPlay(payload.Player, payload.Heroes, payload.Deck)
 	if err := c.Con.Create(playerToPlay).Error; err != nil {

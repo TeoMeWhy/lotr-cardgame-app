@@ -33,13 +33,12 @@ def create_player_to_campaign():
     players.append({"name":"Sem Jogador"})
 
     heroes = api.get_cards()
-    decks = api.get_decks()
 
     name_campaign = st.text_input("Nome da Campanha", key="name_campaign_create")
 
     st.markdown("---\n### Jogadores\n")
 
-    players_to_play = [prepare_player(i, players, heroes, decks) for i in range(1, 5)]
+    players_to_play = [prepare_player(i, players, heroes) for i in range(1, 5)]
     players_to_play = [i for i in players_to_play if i is not None]
 
     if st.button("Criar Campanha"):
@@ -64,7 +63,9 @@ def create_player_to_campaign():
         st.rerun()
 
         
-def prepare_player(number, players, cards, decks):
+def prepare_player(number, players, cards):
+
+    decks = api.get_decks()
 
     st.markdown(f"##### Jogador {number}")
     

@@ -1,1 +1,1 @@
-SELECT * FROM players
+SELECT * FROM cards
