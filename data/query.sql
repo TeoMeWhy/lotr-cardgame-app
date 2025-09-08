@@ -1,1 +1,1 @@
-SELECT * FROM campaigns
+SELECT * FROM players

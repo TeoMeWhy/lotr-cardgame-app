@@ -7,25 +7,26 @@ def show_collection():
     st.markdown("## Coleções")
 
     collections = api.get_collections()
+
     if len(collections) == 0:
         st.warning("Nenhuma coleção encontrada. Aproveite para criar uma agora!")
         data = {"name": "", "description": ""}
         collection_inputs(data, mode='create')
-        return
-
-    collections.append({"name":"Criar Nova"})
-    collection_selected = st.selectbox("Selecione uma coleção",
-                                         options=collections,
-                                         format_func=lambda x: x["name"])
-
-    st.markdown("---")
-
-    if collection_selected["name"] == "Criar Nova":
-        data = {"name": "", "description": ""}
-        collection_inputs(data, mode='create')
 
     else:
-        collection_inputs(collection_selected, mode='view')
+        collections.append({"name":"Criar Nova"})
+        collection_selected = st.selectbox("Selecione uma coleção",
+                                            options=collections,
+                                            format_func=lambda x: x["name"])
+
+        st.markdown("---")
+
+        if collection_selected["name"] == "Criar Nova":
+            data = {"name": "", "description": ""}
+            collection_inputs(data, mode='create')
+
+        else:
+            collection_inputs(collection_selected, mode='view')
 
 
 def collection_inputs(collection, mode='create'):

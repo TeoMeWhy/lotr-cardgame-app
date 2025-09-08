@@ -12,6 +12,10 @@ def show_card():
     collections = api.get_collections()
     collection_names = [i["name"] for i in collections]
 
+    if len(collections) == 0:
+        st.warning("Ainda não há coleções criadas. Crie uma coleção para poder criar cartas.")
+        return
+
     lista_cartas, create, edit = st.tabs(["Lista Completa", "Criar Carta", "Editar Carta"])
 
     with lista_cartas:

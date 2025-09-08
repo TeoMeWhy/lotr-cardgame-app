@@ -18,7 +18,7 @@ def show_deck():
         if len(decks) == 0:
             st.warning("Ainda não há decks criados")
 
-        else:
+        else:        
             df = pd.DataFrame(decks)
             df = df[['name', 'description']].rename(columns={"name": "Nome", "description": "Descrição"})
             st.dataframe(df, hide_index=True)
@@ -38,37 +38,42 @@ def show_deck():
             time.sleep(2)
             st.rerun()
 
+
     with edit:
 
-        deck_selected = st.selectbox("Selecione o Deck", options=decks, format_func=lambda deck: deck['name'], key="deck_selected_edit")
+        if len(decks) == 0:
+            st.warning("Ainda não há decks criados")
 
-        st.markdown("---")
+        else:
+            deck_selected = st.selectbox("Selecione o Deck", options=decks, format_func=lambda deck: deck['name'], key="deck_selected_edit")
 
-        deck_name = st.text_input("Nome", value=deck_selected["name"], key="deck_name_edit")
-        deck_description = st.text_area("Descrição", value=deck_selected["description"], key="deck_description_edit")
-        cards_selected = st.multiselect("Selecione as cartas",
-                                        default=deck_selected["cards"],
-                                        options=cards,
-                                        format_func=lambda card: f"{card['name']} ({card['collection']['name']})",
-                                        key="cards_selected_deck_edit")
+            st.markdown("---")
 
-
-        col1, _, col2 = st.columns([1, 2, 1])
-        if col1.button("Salvar Deck"):
-            resp = api.update_deck(name=deck_name, description=deck_description, cards=cards_selected)
-            if "error" in resp:
-                st.error(resp["error"])
-            else:
-                st.success("Deck atualizado com sucesso!")
-            time.sleep(2)
-            st.rerun()
+            deck_name = st.text_input("Nome", value=deck_selected["name"], key="deck_name_edit")
+            deck_description = st.text_area("Descrição", value=deck_selected["description"], key="deck_description_edit")
+            cards_selected = st.multiselect("Selecione as cartas",
+                                            default=deck_selected["cards"],
+                                            options=cards,
+                                            format_func=lambda card: f"{card['name']} ({card['collection']['name']})",
+                                            key="cards_selected_deck_edit")
 
 
-        if col2.button("Excluir Deck"):
-            resp = api.delete_deck(id=deck_selected['id'])
-            if 'error' in resp:
-                st.error(resp["error"])
-            else:
-                st.success("Deck excluído com sucesso!")
+            col1, _, col2 = st.columns([1, 2, 1])
+            if col1.button("Salvar Deck"):
+                resp = api.update_deck(name=deck_name, description=deck_description, cards=cards_selected)
+                if "error" in resp:
+                    st.error(resp["error"])
+                else:
+                    st.success("Deck atualizado com sucesso!")
                 time.sleep(2)
                 st.rerun()
+
+
+            if col2.button("Excluir Deck"):
+                resp = api.delete_deck(id=deck_selected['id'])
+                if 'error' in resp:
+                    st.error(resp["error"])
+                else:
+                    st.success("Deck excluído com sucesso!")
+                    time.sleep(2)
+                    st.rerun()
