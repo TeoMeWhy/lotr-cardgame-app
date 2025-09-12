@@ -23,6 +23,6 @@ func main() {
 		&models.CenarioCampaign{},
 	)
 
-	server := api.NewServer("localhost", "3000", con)
+	server := api.NewServer("0.0.0.0", "3000", con)
 	server.Run()
 }
