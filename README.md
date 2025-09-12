@@ -9,26 +9,22 @@ Todo trabalho foi desenvolvido em live no canal [Téo Me Why](https://twitch.tv/
 
 ## Setup
 
-Há dois componentes nessa aplicação
+Há dois componentes nessa aplicação. E agora você pode rodá-los com docker!
 
 ### Backend
 
-Nosso backend foi feito em GoLang, para isso, você precisará tê-lo instalado para compilar o código.
-
-```bash
-cd src/lotr_api
-go run main.go
-```
+Nosso backend foi feito em GoLang.
 
 ### Frontend
 
-O frontend foi construido em python com a biblioteca `Streamlit`. Assim, é necessário ter o ambiente Python configurado com as devidas bibliotecas.
+O frontend foi construido em python com a biblioteca `Streamlit`.
 
+### Execução
+
+Basta utilizar docker-compose para executar ambos componentes:
 
 ```bash
-cd src/lotr_app
-pip install -r requirements.txt
-streamlit run app.py
+docker-compose up --build -d
 ```
 
 ## Schema
