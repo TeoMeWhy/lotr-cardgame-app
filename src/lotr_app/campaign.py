@@ -32,6 +32,7 @@ def create_player_to_campaign():
     players.append({"name":"Sem Jogador"})
 
     heroes = api.get_cards()
+    heroes = [i for i in heroes if i["type"]=="Herói"]
 
     name_campaign = st.text_input("Nome da Campanha", key="name_campaign_create")
 
@@ -119,6 +120,7 @@ def ficha_base(campaign):
     enable_edit = st.toggle("Habilitar Edição")
 
     all_heroes = api.get_cards()
+    all_heroes = [i for i in all_heroes if i["type"]=="Herói"]
 
     cols = st.columns(len(campaign["players"]))
 
@@ -148,14 +150,13 @@ def ficha_base(campaign):
 
     st.markdown("---")
 
-    st.markdown("##### Heróis Derrotados")    
-    cards = api.get_cards()
+    st.markdown("##### Heróis Derrotados")
     
     col1, col2 = st.columns([2,1])
 
     with col1.container(border=True):
         defeated_heroes = st.multiselect("Marque todos heróis derrotados na campanha",
-                                options=cards,
+                                options=all_heroes,
                                 default=campaign["defeated_heroes"],
                                 format_func=lambda x: f'{x["name"]} ({x["collection"]["name"]})',
                                 disabled=not enable_edit)
