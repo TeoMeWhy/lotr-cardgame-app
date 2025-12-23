@@ -64,7 +64,7 @@ def show_deck():
 
             col1, _, col2 = st.columns([1, 2, 1])
             if col1.button("Salvar Deck"):
-                resp = api.update_deck(name=deck_name, description=deck_description, cards=cards_selected)
+                resp = api.update_deck(id=deck_selected['id'], name=deck_name, description=deck_description, cards=cards_selected)
                 if "error" in resp:
                     st.error(resp["error"])
                 else:

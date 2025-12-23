@@ -353,6 +353,10 @@ func (c *Controller) PutDeck(ctx fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
+	if payload.Id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Failed to update deck: invalid id"})
+	}
+
 	if err := c.Con.Save(&payload).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update deck"})
 	}

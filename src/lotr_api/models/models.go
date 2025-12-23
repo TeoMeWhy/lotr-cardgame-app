@@ -48,6 +48,7 @@ type Card struct {
 	Name         string     `json:"name" gorm:"varchar(100);not null"`
 	Description  string     `json:"description" gorm:"varchar(100);not null"`
 	Type         string     `json:"type" gorm:"varchar(100);not null"`
+	Subtitle     string     `json:"subtitle" gorm:"varchar(100);not null"`
 	Cost         int        `json:"cost" gorm:"not null"`
 	Willpower    int        `json:"willpower" gorm:"integer"`
 	Attack       int        `json:"attack" gorm:"integer"`
@@ -66,7 +67,7 @@ type Deck struct {
 type Cenario struct {
 	Id           string     `json:"id" gorm:"primaryKey"`
 	Name         string     `json:"name" gorm:"not null;unique;varchar(100)"`
-	Description  string     `json:"description" gorm:"not null;varchar(255)"`
+	Description  string     `json:"description" gorm:"not null;text"`
 	Order        int        `json:"order" gorm:"not null"`
 	CollectionID string     `json:"collection_id" gorm:"not null"`
 	Collection   Collection `json:"collection" gorm:"foreignKey:CollectionID"`

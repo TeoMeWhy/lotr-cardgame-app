@@ -83,6 +83,7 @@ def create_card(collections):
         "name": "",
         "description": "",
         "type": "",
+        "subtitle":"",
         "cost": 0,
         "willpower": 0,
         "attack": 0,
@@ -108,13 +109,16 @@ def edit_card(collections):
 
     cards = api.get_cards()
 
+    if len(cards)==0:
+        return
+
     card = st.selectbox("Selecione a carta para editar",
                         options=cards,
                         format_func=lambda x: f'{x["name"]} ({x["collection"]["name"]} - {x["number"]})',
                         key="edit_card_selectbox"
                         )
 
-    card.update(collect_card_info(card, collections, mode='edit'))
+    card = collect_card_info(card, collections, mode='edit')
 
     col_edit, _, col_excl = st.columns([1, 2, 1])
 
@@ -152,7 +156,8 @@ def collect_card_info(data, collections, mode='create'):
     card_number_select_box = c2.number_input("Número", min_value=1, max_value=500, value=data["number"],key=f"create_card_number_{mode}")
 
     card_name_select_box = st.text_input("Nome", value=data["name"], key=f"create_card_name_{mode}")
-    card_description_select_box = st.text_area("Descrição", value=data["description"], key=f"create_card_description_{mode}")
+    card_description_box = st.text_area("Descrição", value=data["description"], key=f"create_card_description_{mode}")
+    card_subtitle_box = st.text_area("Subtítulo", value=data["subtitle"], key=f"create_card_subtitle_{mode}")
 
     type_cards_list = ["Herói", "Aliado", "Complemento", "Evento"]
     type_cards_list.sort()
@@ -160,7 +165,7 @@ def collect_card_info(data, collections, mode='create'):
 
     c1, c2 = st.columns(2)
     card_cost = c1.number_input("Custo", min_value=0, max_value=20, value=data["cost"], key=f"create_card_cost_{mode}")
-    sphere_types = ['Liderança', 'Conhecimento', 'Espírito', 'Tática']
+    sphere_types = ['Liderança', 'Conhecimento', 'Espírito', 'Tática', 'Neutro']
     sphere_types.sort()
     card_sphereType = c2.selectbox("Tipo de Esfera", options=sphere_types ,key=f"create_card_sphereType_{mode}", index=sphere_types.index(data["sphere_type"]) if data['sphere_type']!="" else 0)
 
@@ -177,7 +182,8 @@ def collect_card_info(data, collections, mode='create'):
         "collection_id": card_collection_select_box["id"],
         "number": card_number_select_box,
         "name": card_name_select_box,
-        "description": card_description_select_box,
+        "description": card_description_box,
+        "subtitle":card_subtitle_box,
         "type": card_type_select_box,
         "cost": card_cost,
         "willpower": card_willpower,
