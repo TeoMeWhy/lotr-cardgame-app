@@ -132,10 +132,13 @@ def ficha_base(campaign):
 
                 player = campaign["players"][i]
 
-                heroes = "\n".join([f'|{h["name"]}|' for h in player['heroes']])
+                deck = player['deck']
 
-                st.markdown(f"""###### Jogador {i+1} - {player['player']['name']}""")
+                st.markdown(f"###### Jogador {i+1} - {player['player']['name']}")
                 
+                st.markdown(f"###### Deck {deck['name']}")
+                st.markdown(f"{deck['description']}")
+
                 player['heroes'] = st.multiselect(label="",
                                                   options=all_heroes,
                                                   default=player['heroes'],
