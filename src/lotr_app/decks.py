@@ -14,6 +14,10 @@ def show_deck():
     decks = api.get_decks()
     cards = api.get_cards()
 
+    if len(cards) == 0:
+        st.error("Ainda não há cartas cadastradas")
+        return
+
     with lista_decks:
         if len(decks) == 0:
             st.warning("Ainda não há decks criados")

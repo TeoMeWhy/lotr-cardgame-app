@@ -13,31 +13,69 @@ from players import show_player
 
 st.set_page_config(page_title="Senhor dos Anéis")
 
-st.markdown("""
-            
-# Senhor dos Anéis
-#### Ficha de Campanha
+def main():
+    st.markdown("""
+                
+    # Senhor dos Anéis
+    #### Ficha de Campanha
 
-Por aqui, você poderá criar suas campanhas, players, e gerenciar seus avanços. A ideia é facilitar o acompanhamento do progresso de campanha.            
-            
-""")
+    Por aqui, você poderá criar suas campanhas, players, e gerenciar seus avanços. A ideia é facilitar o acompanhamento do progresso de campanha.            
+                
+    """)
 
-campaign, players, decks, cards, cenarios, collections = st.tabs(["Campanhas", "Players", "Decks", "Cartas", "Cenários", "Coleções"])
 
-with campaign:
-    show_campaign()
+    players = api.get_players()
+    decks = api.get_decks()
+    cards = api.get_cards()
+    cenarios = api.get_cenarios()
+    collections = api.get_collections()
 
-with players:
-    show_player()
 
-with decks:
-    show_deck()
+    tab_campaign, tab_players, tab_decks, tab_cards, tab_cenarios, tab_collections = st.tabs(["Campanhas", "Players", "Decks", "Cartas", "Cenários", "Coleções"])
 
-with cards:
-    show_card()
+    with tab_campaign:
+        
+        error = False
+        if len(players) == 0:
+            error = True
+            st.error("Não há jogadores cadastrados")
 
-with cenarios:
-    show_cenario()
+        if len(decks) == 0:
+            error = True
+            st.error("Não há baralhos cadastrados")
 
-with collections:
-    show_collection()
+        if len(cards) == 0:
+            error = True
+            st.error("Não há cartas cadastradas")
+
+        if len(cenarios) == 0:
+            error = True
+            st.error("Não há cenarios cadastrados")
+
+        if len(collections) == 0:
+            error = True
+            st.error("Nao há coleções cadastradas")
+
+        if not error:
+            show_campaign()
+
+    with tab_players:
+        show_player()
+
+    with tab_decks:
+        show_deck()
+
+    with tab_cards:
+        show_card()
+
+    with tab_cenarios:
+        if len(collections) == 0:
+            st.error("Nao há coleções cadastradas")
+        else:
+            show_cenario()
+
+    with tab_collections:
+        show_collection()
+
+if __name__ == "__main__":
+    main()

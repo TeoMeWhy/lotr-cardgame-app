@@ -1,7 +1,6 @@
 import time
 
 import streamlit as st
-import pandas as pd
 from clients import api
 
 
