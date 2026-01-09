@@ -14,7 +14,7 @@ type Campaign struct {
 	Notes            string            `json:"notes" gorm:"varchar(255)"`
 	CreatedAt        time.Time         `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt        time.Time         `json:"updated_at" gorm:"autoUpdateTime"`
-	LeaderId         string            `json:"leader_id" gorm:"not null"`
+	LeaderId         string            `json:"leader_id" gorm:"varchar(100)"`
 	Leader           Player            `json:"leader" gorm:"foreignKey:LeaderId"`
 	Players          []PlayerToPlay    `json:"players" gorm:"many2many:player_campaign;"`
 	CenarioCampaigns []CenarioCampaign `json:"cenario_campaigns" gorm:"foreignKey:CampaignID;references:Id"`
@@ -63,7 +63,7 @@ type Card struct {
 
 type Deck struct {
 	Id          string `json:"id" gorm:"primaryKey"`
-	OwnerId     string `json:"owner_id" gorm:"not null"`
+	OwnerId     string `json:"owner_id" gorm:"varchar(100)"`
 	Owner       Player `json:"owner" gorm:"foreignKey:OwnerId"`
 	Name        string `json:"name" gorm:"not null;varchar(100);unique"`
 	Description string `json:"description" gorm:"not null;varchar(255)"`
