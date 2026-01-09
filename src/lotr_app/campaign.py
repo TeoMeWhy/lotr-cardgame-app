@@ -5,9 +5,12 @@ from clients import api
 
 
 def show_campaign():
+
     st.markdown("## Campanhas")
 
     campaigns = api.get_campaigns()
+    if not st.session_state["player"]["is_admin"]:
+        campaigns = [c for c in campaigns if st.session_state["player"]["id"] == c['leader_id'] or st.session_state["player"]["id"] in [p['player_id'] for p in c['players']]]
 
     if len(campaigns) == 0:
         st.warning("Nenhuma campanha encontrada. Aproveite para criar uma nova!")
@@ -29,7 +32,7 @@ def show_campaign():
 
 def create_player_to_campaign():
     players = api.get_players()
-    players.append({"name":"Sem Jogador"})
+    players.append({"nick":"Sem Jogador",})
 
     heroes = api.get_cards()
     heroes = [i for i in heroes if i["type"]=="Herói"]
@@ -38,8 +41,14 @@ def create_player_to_campaign():
 
     st.markdown("---\n### Jogadores\n")
 
-    players_to_play = [prepare_player(i, players, heroes) for i in range(1, 5)]
-    players_to_play = [i for i in players_to_play if i is not None]
+    players_to_play = []
+    for i in range(1, 5):
+        player_to_play = prepare_player(i, players, heroes)
+        if player_to_play:
+            players = [p for p in players if player_to_play["player"] != p]
+            heroes = [h for h in heroes if h not in player_to_play["heroes"]]
+            players_to_play.append(player_to_play)
+
 
     if st.button("Criar Campanha"):
 
@@ -52,14 +61,14 @@ def create_player_to_campaign():
             else:
                 players_to_campaign.append(resp)
 
-
         campaign_data = {
             "name": name_campaign,
+            "leader_id": st.session_state["player"]["id"],
             "players": players_to_campaign,
         }
         api.create_campaign(**campaign_data)
         st.success("Campanha criada com sucesso!")
-        time.sleep(2)
+        time.sleep(1)
         st.rerun()
 
         
@@ -74,7 +83,7 @@ def prepare_player(number, players, cards):
     player = col1.selectbox("Nome",
                           players,
                           index=len(players)-1,
-                          format_func=lambda x: x["name"],
+                          format_func=lambda x: x["nick"],
                           key=f"player_{number}_name")
     
     heroes = col2.multiselect("Heróis",
@@ -90,7 +99,7 @@ def prepare_player(number, players, cards):
     
     st.markdown("---")
 
-    if player is None or player == {"name": "Sem Jogador"}:
+    if player is None or player == {"nick": "Sem Jogador"}:
         return None
 
     player2play = {
@@ -117,7 +126,7 @@ def ficha_base(campaign):
 
     st.markdown("#### Registro de Campanha - Ficha Base")
 
-    enable_edit = st.toggle("Habilitar Edição")
+    enable_edit = st.toggle("Habilitar Edição", disabled=campaign['leader_id']!=st.session_state['player']['id'])
 
     all_heroes = api.get_cards()
     all_heroes = [i for i in all_heroes if i["type"]=="Herói"]
@@ -134,7 +143,7 @@ def ficha_base(campaign):
 
                 deck = player['deck']
 
-                st.markdown(f"###### Jogador {i+1} - {player['player']['name']}")
+                st.markdown(f"###### Jogador {i+1} - {player['player']['nick']}")
                 
                 st.markdown(f"###### Deck {deck['name']}")
                 st.markdown(f"{deck['description']}")
@@ -188,7 +197,7 @@ def ficha_base(campaign):
             for p in campaign["players"]:
                 resp = api.put_player_to_play(**p)
                 if 'error' in resp:
-                    st.error(f"Erro ao salvar jogador {p['player']['name']}: {resp['error']}")
+                    st.error(f"Erro ao salvar jogador {p['player']['nick']}: {resp['error']}")
 
             resp = api.put_campaign(**campaign)
             if "error" in resp:
@@ -225,7 +234,7 @@ def summary_cenario(campaign):
         col3.markdown(f"##### {campaign['points']}")
         st.markdown("---")
 
-    if st.toggle("Adicionar Cenário"):
+    if st.toggle("Adicionar Cenário", disabled= campaign['leader_id'] != st.session_state['player']['id']):
         expander_cenario(campaign, {}, mode='create')
 
 
@@ -247,7 +256,10 @@ def expander_cenario(campaign, cenario_campaign, mode='create'):
         
     with st.expander(label=f"Detalhes", expanded=mode=='create'):
 
-        edit_toggle = st.toggle("Habilitar Edição", key=f"edit_cenario_{campaign['id']}_{cenario['id']}") if mode != 'create' else True
+        edit_toggle = st.toggle("Habilitar Edição", key=f"edit_cenario_{campaign['id']}_{cenario['id']}", disabled=campaign['leader_id'] != st.session_state['player']['id'])
+        if mode == 'create':
+            edit_toggle = True
+        
         col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([2,2,1,2,1,2,1,2])
 
         col1.markdown("Jogador")
@@ -317,7 +329,7 @@ def get_cenario_players(campaign, cenario_player, cenario, edit=True):
         p = cenario_player
         c1, c2, c3, c4, c5, c6, c7, c8 = st.columns([2,2,1,2,1,2,1,2])
         
-        c1.markdown(p['player']['name'])
+        c1.markdown(p['player']['nick'])
         threat_player = c2.number_input("", min_value=20, max_value=50,step=1,
                                 key=f"final_threat_{cenario['id']}_{p['player']['id']}",
                                 label_visibility='collapsed',

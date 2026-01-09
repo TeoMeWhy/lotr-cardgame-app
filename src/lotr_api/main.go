@@ -21,6 +21,7 @@ func main() {
 		&models.Cenario{},
 		&models.CenarioPlayer{},
 		&models.CenarioCampaign{},
+		&models.PlayerCampaignInvite{},
 	)
 
 	server := api.NewServer("0.0.0.0", "3000", con)
