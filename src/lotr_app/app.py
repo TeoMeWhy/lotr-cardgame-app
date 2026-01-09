@@ -32,8 +32,9 @@ def main():
         return
     
     else:
-        st.success(f"Bem-vindo, {st.user.name}!")
-        st.button("Logout", on_click=st.logout)
+        cols = st.columns([9, 1])
+        cols[0].success(f"Bem-vindo, {st.user.name}!")
+        cols[1].button("Logout", on_click=st.logout)
 
 
     players = api.get_players()
