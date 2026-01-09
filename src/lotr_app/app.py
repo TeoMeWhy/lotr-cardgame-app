@@ -32,7 +32,7 @@ def main():
         return
     
     else:
-        cols = st.columns([9, 1])
+        cols = st.columns([8, 2])
         cols[0].success(f"Bem-vindo, {st.user.name}!")
         cols[1].button("Logout", on_click=st.logout)
 
