@@ -14,6 +14,8 @@ type Campaign struct {
 	Notes            string            `json:"notes" gorm:"varchar(255)"`
 	CreatedAt        time.Time         `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt        time.Time         `json:"updated_at" gorm:"autoUpdateTime"`
+	LeaderId         string            `json:"leader_id" gorm:"not null"`
+	Leader           Player            `json:"leader" gorm:"foreignKey:LeaderId"`
 	Players          []PlayerToPlay    `json:"players" gorm:"many2many:player_campaign;"`
 	CenarioCampaigns []CenarioCampaign `json:"cenario_campaigns" gorm:"foreignKey:CampaignID;references:Id"`
 	DefeatedHeros    []Card            `json:"defeated_heroes" gorm:"many2many:campaign_defeated_heroes;"`
@@ -22,6 +24,8 @@ type Campaign struct {
 type Player struct {
 	Id        string    `json:"id" gorm:"primaryKey;autoIncrement"`
 	Name      string    `json:"name" gorm:"unique"`
+	Email     string    `json:"email" gorm:"unique"`
+	IsAdmin   bool      `json:"is_admin" gorm:"default:false"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 
@@ -59,6 +63,8 @@ type Card struct {
 
 type Deck struct {
 	Id          string `json:"id" gorm:"primaryKey"`
+	OwnerId     string `json:"owner_id" gorm:"not null"`
+	Owner       Player `json:"owner" gorm:"foreignKey:OwnerId"`
 	Name        string `json:"name" gorm:"not null;varchar(100);unique"`
 	Description string `json:"description" gorm:"not null;varchar(255)"`
 	Cards       []Card `json:"cards" gorm:"many2many:deck_cards;"`
@@ -99,19 +105,32 @@ type CenarioCampaign struct {
 	TotalFinalPoints   int             `json:"total_final_points" gorm:"not null"`
 }
 
-func NewPlayer(name string) *Player {
+type PlayerCampaignInvite struct {
+	Id         string    `json:"id" gorm:"primaryKey"`
+	CampaignId string    `json:"campaign_id" gorm:"not null"`
+	Campaign   Campaign  `json:"campaign" gorm:"foreignKey:CampaignId"`
+	PlayerId   string    `json:"player_id" gorm:"not null"`
+	Player     Player    `json:"player" gorm:"foreignKey:PlayerId"`
+	Accepted   bool      `json:"accepted" gorm:"default:false"`
+	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
+}
+
+func NewPlayer(name, email string, isAdmin bool) *Player {
 	id := uuid.New().String()
 	return &Player{
-		Id:   id,
-		Name: name,
+		Id:      id,
+		Name:    name,
+		Email:   email,
+		IsAdmin: isAdmin,
 	}
 }
 
-func NewCampaign(name string, players []PlayerToPlay) *Campaign {
+func NewCampaign(name string, leader Player, players []PlayerToPlay) *Campaign {
 	id := uuid.New().String()
 	return &Campaign{
 		Id:      id,
 		Name:    name,
+		Leader:  leader,
 		Players: players,
 		Points:  0,
 	}
@@ -156,10 +175,11 @@ func NewCard(
 	}
 }
 
-func NewDeck(name, description string, cards []Card) *Deck {
+func NewDeck(player Player, name, description string, cards []Card) *Deck {
 	id := uuid.New().String()
 	return &Deck{
 		Id:          id,
+		Owner:       player,
 		Name:        name,
 		Description: description,
 		Cards:       cards,
@@ -226,4 +246,18 @@ func NewCenarioCampaign(campaignID, cenarioID string, cenarioPlayers []CenarioPl
 		TotalPointsPlayers: totalPointsPlayers,
 		TotalFinalPoints:   totalFinalPoints,
 	}
+}
+
+func NewPlayerCampaignInvite(campaignID, playerID string) *PlayerCampaignInvite {
+
+	id := uuid.New().String()
+	return &PlayerCampaignInvite{
+		Id:         id,
+		CampaignId: campaignID,
+		Campaign:   Campaign{Id: campaignID},
+		PlayerId:   playerID,
+		Player:     Player{Id: playerID},
+		Accepted:   false,
+	}
+
 }
