@@ -30,6 +30,10 @@ def main():
         if st.button("Login com Google"):
             st.login()
         return
+    
+    else:
+        st.success(f"Bem-vindo, {st.user.name}!")
+        st.button("Logout", on_click=st.logout)
 
 
     players = api.get_players()
