@@ -41,8 +41,14 @@ def create_player_to_campaign():
 
     st.markdown("---\n### Jogadores\n")
 
-    players_to_play = [prepare_player(i, players, heroes) for i in range(1, 5)]
-    players_to_play = [i for i in players_to_play if i is not None]
+    players_to_play = []
+    for i in range(1, 5):
+        player_to_play = prepare_player(i, players, heroes)
+        if player_to_play:
+            players = [p for p in players if player_to_play["player"] != p]
+            heroes = [h for h in heroes if h not in player_to_play["heroes"]]
+            players_to_play.append(player_to_play)
+
 
     if st.button("Criar Campanha"):
 
