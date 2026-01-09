@@ -23,7 +23,8 @@ type Campaign struct {
 
 type Player struct {
 	Id        string    `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name      string    `json:"name" gorm:"unique"`
+	Name      string    `json:"name" gorm:"not null;varchar(100)"`
+	Nick      string    `json:"nick" gorm:"unique"`
 	Email     string    `json:"email" gorm:"unique"`
 	IsAdmin   bool      `json:"is_admin" gorm:"default:false"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
@@ -115,24 +116,25 @@ type PlayerCampaignInvite struct {
 	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
 }
 
-func NewPlayer(name, email string, isAdmin bool) *Player {
+func NewPlayer(name, nick, email string, isAdmin bool) *Player {
 	id := uuid.New().String()
 	return &Player{
 		Id:      id,
 		Name:    name,
+		Nick:    nick,
 		Email:   email,
 		IsAdmin: isAdmin,
 	}
 }
 
-func NewCampaign(name string, leader Player, players []PlayerToPlay) *Campaign {
+func NewCampaign(name, leaderId string, players []PlayerToPlay) *Campaign {
 	id := uuid.New().String()
 	return &Campaign{
-		Id:      id,
-		Name:    name,
-		Leader:  leader,
-		Players: players,
-		Points:  0,
+		Id:       id,
+		Name:     name,
+		LeaderId: leaderId,
+		Players:  players,
+		Points:   0,
 	}
 }
 

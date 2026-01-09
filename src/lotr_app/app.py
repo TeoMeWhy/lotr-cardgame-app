@@ -17,20 +17,59 @@ def main():
     st.markdown("""
                 
     # Senhor dos Anéis
-    #### Ficha de Campanha
+    #### Progresso da Campanha
 
-    Por aqui, você poderá criar suas campanhas, players, e gerenciar seus avanços. A ideia é facilitar o acompanhamento do progresso de campanha.            
+    App destinado a entusiastas do jogo "O Senhor dos Anéis: cardgame" para gerenciar campanhas.
                 
+    No lugar de impreimir suas fichas de campanhas, utilize esse app para acompanhar seu progresso e testes diferentes decks!
+
     """)
 
+    if not st.user.is_logged_in:
+        st.warning("Por favor, faça login para acessar o app.")
+        if st.button("Login com Google"):
+            st.login()
+        return
+
+
+    players = api.get_players()
+    player = [i for i in players if i["email"] == st.user.email]
+    if len(player) == 0:
+        
+        st.info("Novo jogador! Criando perfil... só precisamos de seu nick")
+        nick_input = st.text_input("Nick", key="nick_input")
+        
+        if len([i for i in players if i["nick"] == nick_input]) > 0:
+            st.error("Nick já está em uso, por favor escolha outro.")
+            return
+        
+        if st.button("Finalizar!"):
+            st.session_state["player"] = api.create_player(name=st.user.name, email=st.user.email, nick=nick_input)
+            st.rerun()
+        
+        st.stop()
+    else:
+        st.session_state["player"] = player[0]
+
+    st.write(players)
+    st.write(st.session_state["player"])
+
+    if st.session_state["player"]["is_admin"]:
+        show_admin()
+        return
+    
+    st.write(st.session_state["player"])
+    show_campaign()
+
+
+def show_admin():
 
     players = api.get_players()
     decks = api.get_decks()
     cards = api.get_cards()
     cenarios = api.get_cenarios()
     collections = api.get_collections()
-
-
+    
     tab_campaign, tab_players, tab_decks, tab_cards, tab_cenarios, tab_collections = st.tabs(["Campanhas", "Players", "Decks", "Cartas", "Cenários", "Coleções"])
 
     with tab_campaign:
@@ -76,6 +115,7 @@ def main():
 
     with tab_collections:
         show_collection()
+
 
 if __name__ == "__main__":
     main()

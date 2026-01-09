@@ -47,7 +47,7 @@ func (c *Controller) CreatePlayer(ctx fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
-	player := models.NewPlayer(payload.Name, payload.Email, payload.IsAdmin)
+	player := models.NewPlayer(payload.Name, payload.Nick, payload.Email, payload.IsAdmin)
 
 	if err := c.Con.Create(&player).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create player"})
@@ -126,7 +126,7 @@ func (c *Controller) CreateCampaign(ctx fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
-	campaign := models.NewCampaign(payload.Name, payload.Leader, payload.Players)
+	campaign := models.NewCampaign(payload.Name, payload.LeaderId, payload.Players)
 
 	if err := c.Con.Create(&campaign).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create campaign"})
