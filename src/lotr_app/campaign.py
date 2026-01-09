@@ -68,7 +68,7 @@ def create_player_to_campaign():
         }
         api.create_campaign(**campaign_data)
         st.success("Campanha criada com sucesso!")
-        time.sleep(2)
+        time.sleep(1)
         st.rerun()
 
         
@@ -126,7 +126,7 @@ def ficha_base(campaign):
 
     st.markdown("#### Registro de Campanha - Ficha Base")
 
-    enable_edit = st.toggle("Habilitar Edição", disabled= campaign['leader_id'] != st.session_state['player']['id'])
+    enable_edit = st.toggle("Habilitar Edição", disabled=campaign['leader_id']!=st.session_state['player']['id'])
 
     all_heroes = api.get_cards()
     all_heroes = [i for i in all_heroes if i["type"]=="Herói"]

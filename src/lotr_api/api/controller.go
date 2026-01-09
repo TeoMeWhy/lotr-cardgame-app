@@ -303,7 +303,7 @@ func (c *Controller) DeleteCard(ctx fiber.Ctx) error {
 
 func (c *Controller) GetDecks(ctx fiber.Ctx) error {
 
-	loader := c.Con.Preload("Cards").Preload("Cards.Collection")
+	loader := c.Con.Preload("Cards").Preload("Cards.Collection").Preload("Owner")
 
 	id := ctx.Query("id")
 	if id != "" {
@@ -337,7 +337,7 @@ func (c *Controller) CreateDeck(ctx fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
-	deck := models.NewDeck(payload.Owner, payload.Name, payload.Description, payload.Cards)
+	deck := models.NewDeck(payload.OwnerId, payload.Name, payload.Description, payload.Cards)
 
 	if err := c.Con.Create(&deck).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create deck"})

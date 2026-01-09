@@ -177,11 +177,12 @@ func NewCard(
 	}
 }
 
-func NewDeck(player Player, name, description string, cards []Card) *Deck {
+func NewDeck(ownerID, name, description string, cards []Card) *Deck {
 	id := uuid.New().String()
 	return &Deck{
 		Id:          id,
-		Owner:       player,
+		OwnerId:     ownerID,
+		Owner:       Player{Id: ownerID},
 		Name:        name,
 		Description: description,
 		Cards:       cards,

@@ -51,16 +51,16 @@ def main():
     else:
         st.session_state["player"] = player[0]
 
-    st.write(players)
-    st.write(st.session_state["player"])
-
     if st.session_state["player"]["is_admin"]:
         show_admin()
         return
     
-    st.write(st.session_state["player"])
-    show_campaign()
+    campaign_tab, decks_tab = st.tabs(["Campanha", "Decks"])
+    with campaign_tab:
+        show_campaign()
 
+    with decks_tab:
+        show_deck()
 
 def show_admin():
 
