@@ -14,46 +14,67 @@ def show_collection():
         collection_inputs(data, mode='create')
 
     else:
-        collections.append({"name":"Criar Nova"})
+        if st.session_state["player"]["is_admin"]:
+            collections.append({"name":"Criar Nova"})
+        
         collection_selected = st.selectbox("Selecione uma coleção",
                                             options=collections,
                                             format_func=lambda x: x["name"])
 
         st.markdown("---")
 
+        if not st.session_state["player"]["is_admin"]:
+            show_collection_to_user(collection_selected)
+            return
+        
         if collection_selected["name"] == "Criar Nova":
             data = {"name": "", "description": ""}
             collection_inputs(data, mode='create')
 
         else:
-            collection_inputs(collection_selected, mode='view')
+            collection_inputs(collection_selected, mode='edit')
 
+
+def show_collection_to_user(collection):
+    st.markdown(f"### {collection['name']}")
+    st.markdown(f"{collection['description']}")
 
 def collection_inputs(collection, mode='create'):
     bt_name = st.text_input("Nome da coleção",
                             value=collection["name"],
                             key=f"collection_name_{mode}",
-                            disabled=mode!='create',
                             )
     
     bt_description = st.text_area("Descrição",
                                    value=collection["description"],
                                    key=f"collection_description_{mode}",
-                                   disabled=mode!='create',
                                    )
 
-    if st.button("Salvar Coleção", key=f'collection_save_bt_{mode}', disabled=mode!='create'):
+    if st.button("Salvar Coleção", key=f'collection_save_bt_{mode}'):
         data = {
             "name": bt_name,
             "description": bt_description,
         }
 
-        resp = api.create_collection(**data)
+        if mode == "create":
+            resp = api.create_collection(**data)
         
-        if "error" in resp:
-            st.error(resp["error"])
+            if "error" in resp:
+                st.error(resp["error"])
+            
+            else:
+                st.success("Coleção criada com sucesso!")
+                time.sleep(1)
+                st.rerun()
         
-        else:
-            st.success("Coleção criada com sucesso!")
-            time.sleep(1)
-            st.rerun()
+        elif mode == "edit":
+            data["id"] = collection["id"]
+            resp = api.put_collection(**data)
+        
+            if "error" in resp:
+                st.error(resp["error"])
+            
+            else:
+                st.success("Coleção atualizada com sucesso!")
+                time.sleep(1)
+                st.rerun()

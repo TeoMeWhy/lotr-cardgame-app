@@ -77,8 +77,8 @@ def show_user():
     with cenarios_tab:
         show_cenario()
 
-    # with collections_tab:
-    #     show_collection()
+    with collections_tab:
+        show_collection()
 
 
 def show_admin():

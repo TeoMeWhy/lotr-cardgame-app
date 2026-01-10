@@ -218,6 +218,24 @@ func (c *Controller) CreateCollection(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusCreated).JSON(collection)
 }
 
+func (c *Controller) PutCollection(ctx fiber.Ctx) error {
+
+	payload := models.Collection{}
+	if err := ctx.Bind().Body(&payload); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+	}
+
+	if payload.Id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Failed to update collection: invalid id"})
+	}
+
+	if err := c.Con.Save(&payload).Error; err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update collection"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(payload)
+}
+
 func (c *Controller) GetCards(ctx fiber.Ctx) error {
 
 	loader := c.Con.Preload("Collection")

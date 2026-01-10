@@ -20,6 +20,7 @@ func AddCollectionRoutes(app *APIServer) {
 	collectionRoutes := app.App.Group("/collections")
 	collectionRoutes.Get("/", app.Controller.GetCollections)
 	collectionRoutes.Post("/", app.Controller.CreateCollection)
+	collectionRoutes.Put("/", app.Controller.PutCollection)
 }
 
 func AddCardRoutes(app *APIServer) {
