@@ -74,8 +74,8 @@ def show_user():
     with cards_tab:
         show_card()
 
-    # with cenarios_tab:
-    #     show_cenario()
+    with cenarios_tab:
+        show_cenario()
 
     # with collections_tab:
     #     show_collection()
