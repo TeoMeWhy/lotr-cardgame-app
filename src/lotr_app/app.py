@@ -59,13 +59,27 @@ def main():
     if st.session_state["player"]["is_admin"]:
         show_admin()
         return
+
+    show_user()    
     
-    campaign_tab, decks_tab = st.tabs(["Campanha", "Decks"])
+
+def show_user():
+    campaign_tab, decks_tab, cards_tab, cenarios_tab, collections_tab = st.tabs(["Campanha", "Decks", "Cartas", "Cenários", "Coleções"])
     with campaign_tab:
         show_campaign()
 
     with decks_tab:
         show_deck()
+
+    with cards_tab:
+        show_card()
+
+    # with cenarios_tab:
+    #     show_cenario()
+
+    # with collections_tab:
+    #     show_collection()
+
 
 def show_admin():
 

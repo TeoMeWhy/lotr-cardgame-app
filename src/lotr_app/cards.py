@@ -10,39 +10,57 @@ def show_card():
     st.markdown("## Cartas")
 
     collections = api.get_collections()
-    collection_names = [i["name"] for i in collections]
 
     if len(collections) == 0:
         st.warning("Ainda não há coleções criadas. Crie uma coleção para poder criar cartas.")
         return
 
-    lista_cartas, create, edit = st.tabs(["Lista Completa", "Criar Carta", "Editar Carta"])
+    if st.session_state["player"]["is_admin"]:
+        lista_cartas, create, edit = st.tabs(["Lista Completa", "Criar Carta", "Editar Carta"])
 
-    with lista_cartas:
-        collections_select_box = st.selectbox("Selecione uma coleção", collection_names+["Todas"])
+        with lista_cartas:
+            show_all_cards(collections)
 
-        collection_selected = [i for i in collections if i["name"] == collections_select_box]
+        with create:
+            create_card(collections)
 
-        params = {} if len(collection_selected) == 0 else {"collections_id": collection_selected[0]["id"]}
+        with edit:
+            edit_card(collections)
 
-        cards = api.get_cards(**params)
+    else:
+        show_all_cards(collections)
 
-        if len(cards) == 0:
-            st.warning("Nenhuma carta encontrada. Aproveite para criar uma nova carta.")
 
-        else:
-            show_dataframe_cards(cards)
+def show_all_cards(collections):
 
-    with create:
-        create_card(collections)
+    collections_select_box = st.selectbox("Selecione uma coleção", collections+[{"name":"Todas"}], format_func=lambda x: x["name"])
+    params = {} if collections_select_box["name"] == "Todas" else {"collections_id": collections_select_box["id"]}
 
-    with edit:
-        edit_card(collections)
+    cards = api.get_cards(**params)
+
+    if len(cards) == 0:
+        st.warning("Nenhuma carta encontrada. Aproveite para criar uma nova carta.")
+
+    else:
+        show_dataframe_cards(cards)
+
 
 def show_dataframe_cards(cards):
 
     df = pd.DataFrame(cards)
-    columns = ['collection', "number", "name","type", "description"]
+    columns = ['collection',
+               'number',
+               'name',
+               'type',
+               'description',
+               'subtitle',
+               'cost',
+               'willpower',
+               'attack',
+               'defense',
+               'sphere_type',
+               'hit_points',
+    ]
     df = df[columns]
     df["collection"] = df["collection"].apply(lambda x: x["name"])
     df.sort_values(by=["collection", "number"], inplace=True)
@@ -68,10 +86,38 @@ def show_dataframe_cards(cards):
             "Descrição",
             help="Descrição da Carta",
             width="large",
-        )
+        ),
+        "subtitle": st.column_config.TextColumn(
+            "Subtítulo",
+            help="Subtítulo da Carta",
+        ),
+        "cost": st.column_config.NumberColumn(
+            "Custo",
+            help="Custo de recursos para usar a Xarta",
+        ),
+        "willpower": st.column_config.NumberColumn(
+            "Força de Vontade",
+            help="Força de Vontade da Carta",
+        ),
+        "attack": st.column_config.NumberColumn(
+            "Força de Ataque",
+            help="Força de Ataque da Carta",
+        ),
+        "defense": st.column_config.NumberColumn(
+            "Força de Defesa",
+            help="Força de Defesa da Carta",
+        ),
+        "sphere_type": st.column_config.TextColumn(
+            "Tipo de Esfera",
+            help="Tipo de Esfera da Carta", 
+        ),
+        "hit_points": st.column_config.NumberColumn(
+            "Pontos de Vida",
+            help="Pontos de Vida da Carta",
+        ),
     }
 
-    st.dataframe(df, hide_index=True, column_config=column_config)
+    st.dataframe(df, hide_index=True, column_config=column_config, height='stretch')
 
 
 def create_card(collections):
