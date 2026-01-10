@@ -136,6 +136,11 @@ def create_collection(**kwargs):
     return resp.json()
 
 
+def put_collection(**kwargs):
+    resp = requests.put("http://lotr_api:3000/collections", json=kwargs)
+    return resp.json()
+
+
 def create_cenario_campaign(**kwargs):
     resp = requests.post("http://lotr_api:3000/cenario_campaigns", json=kwargs)
     return resp.json()
