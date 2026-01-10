@@ -15,7 +15,9 @@ def show_cenario():
     cenarios = api.get_cenarios()
     if len(cenarios) > 0:
 
-        cenarios.append({"name":"Criar Novo"})
+        if st.session_state["player"]["is_admin"]:
+            cenarios.append({"name":"Criar Novo"})
+        
         cenario_selected = st.selectbox("Selecione um cenário",
                                           options=cenarios,
                                           format_func=lambda x: x["name"])
@@ -27,13 +29,22 @@ def show_cenario():
 
         st.markdown("---")
 
-        cenario_inputs(cenario_selected, collections, mode='edit')
+        if st.session_state["player"]["is_admin"]:
+            cenario_inputs(cenario_selected, collections, mode='edit')
 
-    else:
+        else:
+            show_cenario_to_user(cenario_selected)
+
+    elif st.session_state["player"]["is_admin"]:
         st.warning("Nenhum cenário encontrado. Aproveite para criar um novo")
         cenario = {"name":"", "description":"", "order":1, "collection":collections[0]}
         cenario_inputs(cenario, collections, mode='create')
 
+
+def show_cenario_to_user(cenario):
+    st.markdown(f"### {cenario['name']}")
+    st.markdown(f"**Coleção:** {cenario['collection']['name']} | **Etapa:** {cenario['order']}")
+    st.markdown(f"#### Descrição: {cenario["description"]}")
 
 def cenario_inputs(cenario, collections, mode='create'):
 
@@ -41,7 +52,6 @@ def cenario_inputs(cenario, collections, mode='create'):
     bt_description = st.text_area("Descrição", value=cenario["description"], key=f"cenario_description_{mode}")
     bt_order = st.number_input("Ordem", min_value=1, max_value=15, value=max([1, int(cenario["order"])]), key=f"cenario_order_{mode}")
     bt_collection = st.selectbox("Coleção", options=collections, format_func=lambda x: x["name"], key=f"cenario_collection_{mode}")
-
 
     col1, _, col2 = st.columns([1, 2, 1])
     if col1.button("Salvar Cenário", key=f'cenario_save_bt_{mode}'):
