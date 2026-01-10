@@ -41,7 +41,9 @@ def show_deck():
 
             st.markdown("---")
 
-            edit_togle = st.toggle("Habilitar Edição", disabled=deck_selected["owner_id"]!=st.session_state['player']['id'])
+            edit_togle = st.toggle("Habilitar Edição",
+                                   disabled=deck_selected["owner_id"]!=st.session_state['player']['id'],
+                                   key=f"edit-deck-toggle-{deck_selected['id']}-{st.session_state['player']['id']}")
 
             deck_name = st.text_input("Nome", value=deck_selected["name"], key="deck_name_edit", disabled=not edit_togle)
             deck_description = st.text_area("Descrição", value=deck_selected["description"], key="deck_description_edit", disabled=not edit_togle)
