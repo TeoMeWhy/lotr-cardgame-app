@@ -256,9 +256,10 @@ def expander_cenario(campaign, cenario_campaign, mode='create'):
         
     with st.expander(label=f"Detalhes", expanded=mode=='create'):
 
-        edit_toggle = st.toggle("Habilitar Edição", key=f"edit_cenario_{campaign['id']}_{cenario['id']}", disabled=campaign['leader_id'] != st.session_state['player']['id'])
         if mode == 'create':
             edit_toggle = True
+        else:
+            edit_toggle = st.toggle("Habilitar Edição", key=f"edit_cenario_{campaign['id']}_{cenario['id']}", disabled=campaign['leader_id'] != st.session_state['player']['id'])
         
         col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([2,2,1,2,1,2,1,2])
 
