@@ -160,7 +160,7 @@ func NewCard(
 	sphereType string,
 	hitPoints int,
 ) *Card {
-	id := fmt.Sprintf("%d - %s", number, collectionID)
+	id := uuid.New().String()
 	return &Card{
 		Id:           id,
 		Number:       number,
