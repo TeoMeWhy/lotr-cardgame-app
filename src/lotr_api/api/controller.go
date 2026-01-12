@@ -296,6 +296,10 @@ func (c *Controller) PutCard(ctx fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
+	if payload.Id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Failed to update card: invalid id"})
+	}
+
 	if err := c.Con.Save(payload).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update card"})
 	}
@@ -311,7 +315,12 @@ func (c *Controller) DeleteCard(ctx fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
-	if err := c.Con.Delete(&models.Card{}, "id = ?", payload.Id).Error; err != nil {
+	if payload.Id == "" {
+		log.Println("Invalid input: missing card ID")
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input: missing card ID"})
+	}
+
+	if err := c.Con.Delete(&models.Card{Id: payload.Id}).Error; err != nil {
 		log.Println("Error deleting card:", err)
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete card"})
 	}
