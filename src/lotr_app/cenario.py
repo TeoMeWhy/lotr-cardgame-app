@@ -44,7 +44,7 @@ def show_cenario():
 def show_cenario_to_user(cenario):
     st.markdown(f"### {cenario['name']}")
     st.markdown(f"**Coleção:** {cenario['collection']['name']} | **Etapa:** {cenario['order']}")
-    st.markdown(f"#### Descrição: {cenario["description"]}")
+    st.markdown(cenario["description"])
 
 def cenario_inputs(cenario, collections, mode='create'):
 
