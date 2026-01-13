@@ -11,7 +11,7 @@ from collection import show_collection
 from decks import show_deck
 from players import show_player
 
-st.set_page_config(page_title="Senhor dos Anéis")
+st.set_page_config(page_title="Senhor dos Anéis", page_icon='🌿')
 
 def main():
     st.markdown("""
