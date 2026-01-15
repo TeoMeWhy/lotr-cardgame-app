@@ -21,7 +21,7 @@ def main():
 
     App destinado a entusiastas do jogo "O Senhor dos Anéis: cardgame" para gerenciar campanhas.
                 
-    No lugar de impreimir suas fichas de campanhas, utilize esse app para acompanhar seu progresso e testes diferentes decks!
+    No lugar de imprimir suas fichas de campanhas, utilize esse app para acompanhar seu progresso e testar diferentes decks!
 
     """)
 
@@ -29,6 +29,8 @@ def main():
         st.warning("Por favor, faça login para acessar o app.")
         if st.button("Login com Google"):
             st.login()
+
+        st.info("Ao realizar o login você concorda em compartilhar seu email e nome do usuário Google conosco. Além disso, outros jogadores podem te adicionar em suas respectivas campanhas.")
         return
     
     else:
