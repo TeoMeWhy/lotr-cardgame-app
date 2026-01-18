@@ -161,16 +161,15 @@ def edit_card(collections):
     card_selected = st.selectbox("Selecione a carta para editar",
                         options=cards,
                         format_func=lambda x: f'{x["name"]} ({x["collection"]["name"]} - {x["number"]})',
-                        key="edit_card_selectbox"
+                        key="edit_card_selectbox",
                         )
 
     card_edit = collect_card_info(card_selected, collections, mode='edit')
 
-    card_selected.update(card_edit)
-
     col_edit, _, col_excl = st.columns([1, 2, 1])
 
     if col_edit.button("Salvar Carta"):
+        card_selected.update(card_edit)
         resp = api.put_card(**card_selected)
         if "error" in resp:
             st.error(resp["error"])
